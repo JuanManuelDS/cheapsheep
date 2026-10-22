@@ -21,15 +21,7 @@ Built as a portfolio project and as a deliberate way to practice event-driven ba
 
 A scheduled scraper feeds a Kafka pipeline. Consumers persist prices, evaluate alert conditions, and notify users.
 
-```mermaid
-flowchart LR
-    S[Scheduler] -->|scrape.requested| W[Scraper workers]
-    W -->|price.scraped| H[PriceObservationHandler]
-    H --> DB[(PostgreSQL)]
-    H --> R[(Redis cache)]
-    H -->|price.alert| N[Notification service]
-    W -->|price.scraped| A[Analytics / AI consumer]
-```
+![Main flow.drawio.png](Main%20flow.drawio.png)
 
 ### Kafka topics
 
@@ -39,11 +31,10 @@ flowchart LR
 | `price.scraped` | Fan-out stream of price observations, read by independent consumer groups |
 | `price.alert` | Alert events consumed by the notification service |
 
-**Why Kafka?** Multiple independent consumer groups can read the same stream, and historical events can be replayed into new consumers without re-scraping. Simpler queues don't offer that combination.
 
 ### Code structure
 
-The codebase follows a hexagonal (ports and adapters) architecture: business logic sits at the centre and depends on nothing; Spring, Kafka, JPA and HTTP clients live in adapters at the edge. Patterns are only introduced where they earn their cost.
+The codebase follows a hexagonal (ports and adapters) architecture: business logic sits at the centre and depends on nothing.
 
 ---
 
